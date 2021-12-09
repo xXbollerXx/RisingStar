@@ -6,7 +6,8 @@ public class Player : MonoBehaviour
 {
 
     [SerializeField] private CharacterController Controller; 
-    [SerializeField] private float PlayerSpeed = 1;
+    [SerializeField] private float WalkSpeed = 1;
+    [SerializeField] private float SprintSpeed = 1;
     [SerializeField] private float GravityValue = 1;
     [SerializeField] private float JumpHeight = 1;
     [SerializeField] private float DodgeCoolDown = 1;
@@ -21,11 +22,14 @@ public class Player : MonoBehaviour
     private Vector3 _desiredDirection;
     private bool _isLockedOn = false;
     private Transform _LockedOnTarget;
+    private float _CurrentSpeed;
 
-    // Start is called before the first frame update
+    public bool IsSprinting { get; private set; } = false;
+
+// Start is called before the first frame update
     void Start()
     {
-        
+        _CurrentSpeed = WalkSpeed;
     }
 
     // Update is called once per frame
@@ -44,6 +48,7 @@ public class Player : MonoBehaviour
         Controller.Move(_playerVelocity * Time.deltaTime);
         TryToLockOn();
 
+        UpdateMovementOrientation();
     }
 
     private void TryToLockOn()
@@ -53,6 +58,8 @@ public class Player : MonoBehaviour
             if (_isLockedOn)
             {
                 UnlockFromEnemy();
+
+                
             }
             else
             {
@@ -93,6 +100,8 @@ public class Player : MonoBehaviour
 
     private void UpdateMovement()
     {
+        CheckWantsToSprint();
+
         Vector3 moveRight = Camera.transform.right * Input.GetAxisRaw("Horizontal");
 
         var CrossPro = Vector3.Cross(Camera.transform.right, Vector3.up);
@@ -100,30 +109,49 @@ public class Player : MonoBehaviour
         Vector3 moveForward = CrossPro * Input.GetAxisRaw("Vertical");
         Vector3 moveDelta = moveRight + moveForward;
         moveDelta.Normalize();
-        Controller.Move(moveDelta * Time.deltaTime * PlayerSpeed);
+        Controller.Move(moveDelta * Time.deltaTime * _CurrentSpeed);
 
 
-        if(Input.GetButton("Horizontal") || Input.GetButton("Vertical"))
+        if (Input.GetButton("Horizontal") || Input.GetButton("Vertical"))
         {
             _desiredDirection = moveDelta;
             //Debug.Log(Input.GetAxis("Horizontal"));
         }
-       
+
+        //UpdateMovementOrientation();
+
+    }
+
+    private void UpdateMovementOrientation()
+    {
+        if (_isLockedOn && !IsSprinting)
+        {
+            _desiredDirection = (_LockedOnTarget.position - transform.position).normalized;
+        }
+    
 
         // The step size is equal to speed times frame time.
         float singleStep = RotateSpeed * Time.deltaTime;
-
         // Rotate the forward vector towards the target direction by one step
         Vector3 newDirection = Vector3.RotateTowards(transform.forward, _desiredDirection, singleStep, 0.0f);
 
-        // Draw a ray pointing at our target in
-      //  Debug.DrawRay(transform.position, newDirection, Color.red);
-
         // Calculate a rotation a step closer to the target and applies rotation to this object
         transform.rotation = Quaternion.LookRotation(newDirection);
+    }
 
-       
+    private void CheckWantsToSprint()
+    {
+        if (Input.GetButtonDown("Sprint"))
+        {
+            _CurrentSpeed = SprintSpeed;
+            IsSprinting = true;
+        }
+        else if(Input.GetButtonUp("Sprint"))
+        {
+            _CurrentSpeed = WalkSpeed;
+            IsSprinting = false;
 
+        }
     }
 
     private void TryToJump()

@@ -119,15 +119,12 @@ public class CameraComponent : MonoBehaviour
 
 
 
+        //rotate camera to look at target 
+
         // do the movement/rotation as you're already doing
         // then restore them using Lerp (assuming this is in Update):
         float dt = (float)((float)Time.deltaTime * 2.3); // 2 to 5 give reasonable results
-        Debug.Log(dt);
-
-        if (dt >= 0.95)
-        {
-            Debug.Log("done");
-        }
+        
         transform.localRotation = Quaternion.Slerp(transform.localRotation, _localRotation, dt);
         transform.localPosition = Vector3.Lerp(transform.localPosition, _localPosition, dt);
     }

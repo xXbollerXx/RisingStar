@@ -5,10 +5,7 @@ using UnityEngine;
 public class FollowState : AIState
 {
 
-    public FollowState(AIStateMachine stateMachine) : base(stateMachine)
-    {
-
-    }
+  
 
     public override void OnStateExit()
     {

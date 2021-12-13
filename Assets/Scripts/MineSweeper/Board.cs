@@ -5,6 +5,7 @@ using UnityEngine;
 public class Board : MonoBehaviour
 {
     public enum Event { ClickedBlank, ClickedNearDanger, ClickedDanger, Win };
+    public delegate void DelegateBoxGen(Box box);
 
     [SerializeField] private Box BoxPrefab;
     [SerializeField] private int Width = 10;
@@ -15,11 +16,17 @@ public class Board : MonoBehaviour
     private Vector2Int[] _neighbours;
     private RectTransform _rect;
     private Action<Event> _clickEvent;
+    private DelegateBoxGen _delegateBoxGen;
 
     public void Setup(Action<Event> onClickEvent)
     {
         _clickEvent = onClickEvent;
         Clear();
+    }
+
+    public void Setup_LevelGen(DelegateBoxGen delegateBoxGen)
+    {
+        _delegateBoxGen = delegateBoxGen;
     }
 
     public void Clear()
@@ -43,7 +50,7 @@ public class Board : MonoBehaviour
         {
             dangerList.Add(count < NumberOfDangerousBoxes);
         }
-
+        Debug.Log("ffff");
         dangerList.RandomShuffle();
 
         for (int row = 0; row < Height; ++row)
@@ -51,7 +58,8 @@ public class Board : MonoBehaviour
             for (int column = 0; column < Width; ++column)
             {
                 int index = row * Width + column;
-                _grid[index].Charge(CountDangerNearby(dangerList, index), dangerList[index], OnClickedBox);
+                _grid[index].Charge(CountDangerNearby(dangerList, index), dangerList[index], OnClickedBox);//the numbner, is it a bomb, delegate for on click
+                _delegateBoxGen?.Invoke(_grid[index]);
             }
         }
     }
@@ -60,6 +68,7 @@ public class Board : MonoBehaviour
     {
         _grid = new Box[Width * Height];
         _rect = transform as RectTransform;
+       // _rect = RectTransform;
         RectTransform boxRect = BoxPrefab.transform as RectTransform;
 
         _rect.sizeDelta = new Vector2(boxRect.sizeDelta.x * Width, boxRect.sizeDelta.y * Height);

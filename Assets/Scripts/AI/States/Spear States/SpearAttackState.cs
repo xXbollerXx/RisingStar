@@ -10,13 +10,11 @@ public class SpearAttackState : AttackState
     private bool _isCoolingDown = false;
     private float _EndTimeCache;
 
-    public SpearAttackState(AIStateMachine stateMachine) : base(stateMachine)
-    {
+  
 
-    }
-
-    public override void OnStateEnter()
+    public override void OnStateEnter(AIStateMachine stateMachine)
     {
+        base.OnStateEnter(stateMachine);
         _spearStateMachine = (SpearStateMachine)_stateMachine;
 
         _spearStateMachine.CanChangeState = false;

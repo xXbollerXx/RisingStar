@@ -4,10 +4,7 @@ using UnityEngine;
 
 public class ReturnState : AIState
 {
-    public ReturnState(AIStateMachine stateMachine) : base(stateMachine)
-    {
-
-    }
+  
     public override void OnStateExit()
     {
        

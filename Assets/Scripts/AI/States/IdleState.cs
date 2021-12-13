@@ -5,10 +5,6 @@ using UnityEngine;
 public class IdleState : AIState
 {
 
-    public IdleState(AIStateMachine stateMachine) : base(stateMachine)
-    {
-
-    }
     public override void OnStateExit()
     {
    

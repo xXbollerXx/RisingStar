@@ -19,11 +19,15 @@ public abstract class AIStateMachine : MonoBehaviour
     [Tooltip("blue")]
     [SerializeField] public float ReturnRadius = 1;
 
+    
      public AIState IdleState;
-     public AIState FollowState;
-     public AIState AttackState;
-     public AIState ReturnState;
+    
+    public AIState FollowState;
+ 
+    public AIState AttackState;
 
+    public AIState ReturnState;
+     
 
 
     protected AIState_Deprecated _aIState = AIState_Deprecated.Idle;
@@ -37,31 +41,37 @@ public abstract class AIStateMachine : MonoBehaviour
     public float AttackDelayEndTime { get; set; } = 0;
 
 
-    private void Start()
+    protected virtual void Initialize()
     {
         Animator = GetComponent<Animator>();
         Agent = GetComponent<NavMeshAgent>();
         Player = GameplayStatics.GetPlayer();
         SpawnPosition = transform.position;
 
-        IdleState = new IdleState(this);
-        FollowState = new FollowState(this);
-        AttackState = new SpearAttackState(this);
-        ReturnState = new ReturnState(this);
+       // IdleState = GetComponent<IdleState>();
+      //  FollowState = GetComponent<FollowState>();
+       // AttackState = GetComponent<AttackState>();
+       // ReturnState = GetComponent<ReturnState>();
 
         ChangeState(IdleState);
-       
+
     }
-    private void Update()
+
+
+    private void Start()
+    {
+        Initialize();
+    }
+    protected virtual void Update()
     {
         
         if (!Player) return;
         if (!Agent) return;
+        if (!Animator) return;    
         CurrentState.OnStateTick();
         CurrentState.OnStateTransistionCheck();
         //TransitionCheck();
 
-        if (!Animator) return;    
     }
 
     public void ChangeState(AIState NewState)
@@ -72,7 +82,7 @@ public abstract class AIStateMachine : MonoBehaviour
         }
 
         CurrentState = NewState;
-        CurrentState.OnStateEnter();
+        CurrentState.OnStateEnter(this);
     }
     
     protected virtual void TransitionCheck()
@@ -108,7 +118,7 @@ public abstract class AIStateMachine : MonoBehaviour
 
 
 
-    void OnDrawGizmosSelected()
+    protected virtual void OnDrawGizmosSelected()
     {
         // Display the explosion radius when selected
         Gizmos.color = Color.red;

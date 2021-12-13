@@ -5,11 +5,9 @@ using UnityEngine;
 public class AttackState : AIState
 {
     protected bool _isAttackComplete = false;
+    protected bool _LockMovement = false;
 
-    public AttackState(AIStateMachine stateMachine) : base(stateMachine)
-    {
 
-    }
     public override void OnStateExit()
     {
         _isAttackComplete = false;
@@ -28,5 +26,18 @@ public class AttackState : AIState
             _stateMachine.ChangeState(_stateMachine.IdleState);
 
         }
+    }
+
+    public virtual void OnWindUpComplete()
+    {
+        _LockMovement = true;
+        _stateMachine.Agent.isStopped = true;
+    }
+
+    public virtual void OnAttackComplete()
+    {
+        _isAttackComplete = true;
+        _LockMovement = false;
+        _stateMachine.Agent.isStopped = false;
     }
 }
